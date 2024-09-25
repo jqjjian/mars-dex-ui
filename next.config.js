@@ -1,8 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  images: {
-    domains: ['utfs.io']
-  }
-};
+    // images: {
+    //   domains: ['utfs.io']
+    // }
+    output: 'standalone'
+}
 
-module.exports = nextConfig;
+module.exports = nextConfig
