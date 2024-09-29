@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function Page() {
     return (
-        <div className="flex h-screen flex-col">
+        <>
             <div className="flex justify-end gap-5 pb-5 pt-10">
                 <div className="w-full">
                     <OrderList />
@@ -22,6 +22,6 @@ export default function Page() {
             <div className="flex-1 overflow-hidden">
                 <UserList />
             </div>
-        </div>
+        </>
     )
 }

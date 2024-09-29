@@ -61,7 +61,9 @@ const OrderForm = () => {
     } = useMarsDexStore()
 
     const [symbolList] = useState<string[]>([
-        ...new Set([...tokenlist, 'USDT'])
+        'USDT',
+        'MEME'
+        // ...new Set([...tokenlist, 'USDT'])
     ])
     const [formOpen, setFormOpen] = useState(false)
     const [formToken, setFormToken] = useState('')
@@ -76,11 +78,15 @@ const OrderForm = () => {
     const [approveHash, setApproveHash] = useState<Address>()
     const [tradeHash, setTradeHash] = useState<Address>()
 
-    const tradeAddr = useMemo(
-        () =>
-            methods && methods.length > 1 ? (methods[1] as Address) : undefined,
-        [methods]
-    )
+    const tradeAddr = methods
+        ? useMemo(
+              () =>
+                  methods && methods.length > 1
+                      ? (methods[1] as Address)
+                      : undefined,
+              [methods]
+          )
+        : '0x566137bC9A4a28214B4407dd6dE8bff291C4C21F'
     const mode = useMemo(
         () => (methods && methods.length > 0 ? methods[0] : undefined),
         [methods]
@@ -104,9 +110,34 @@ const OrderForm = () => {
             currentTradeMode === 'BUY' ? sellMemeTradeAddr : buyMemeTradeAddr
         if (methods && methods[0]) {
             router.push(`/${methods[0]}/${_tradeAddr}`)
+        } else {
+            router.push(`/market/${_tradeAddr}`)
         }
     }, [currentTradeMode, sellMemeTradeAddr, buyMemeTradeAddr, router, methods])
 
+    const changeTokenInSymbol = (value: string) => {
+        const _tradeAddr =
+            currentTradeMode === 'BUY' ? sellMemeTradeAddr : buyMemeTradeAddr
+        if (methods && methods[0]) {
+            if (value !== token0Info?.symbol) {
+                handleChangeMode()
+            }
+        } else {
+            router.push(`/market/${_tradeAddr}`)
+        }
+    }
+
+    const changeTokenOutSymbol = (value: string) => {
+        const _tradeAddr =
+            currentTradeMode === 'BUY' ? sellMemeTradeAddr : buyMemeTradeAddr
+        if (methods && methods[0]) {
+            if (value !== token1Info?.symbol) {
+                handleChangeMode()
+            }
+        } else {
+            router.push(`/market/${_tradeAddr}`)
+        }
+    }
     const changeTokenIn = useCallback(
         (value: number) => {
             setTokenIn(value)
@@ -114,7 +145,7 @@ const OrderForm = () => {
                 currentTradeMode === 'BUY'
                     ? value * customPrice
                     : value / customPrice
-            setTokenOut(_out)
+            setTokenOut(Math.round(_out * 1000000) / 1000000)
         },
         [currentTradeMode, customPrice]
     )
@@ -125,7 +156,7 @@ const OrderForm = () => {
                 currentTradeMode === 'BUY'
                     ? value / customPrice
                     : value * customPrice
-            setTokenIn(_in)
+            setTokenIn(Math.round(_in * 1000000) / 1000000)
         },
         [currentTradeMode, customPrice]
     )
@@ -259,7 +290,7 @@ const OrderForm = () => {
                 currentTradeMode === 'BUY'
                     ? tokenIn * currentPrice
                     : tokenIn / currentPrice
-            setTokenOut(_out)
+            setTokenOut(Math.round(_out * 1000000) / 1000000)
             setCustomPrice(currentPrice)
         }
     }, [currentPrice, currentTradeMode, tokenIn])
@@ -272,10 +303,10 @@ const OrderForm = () => {
                     : tokenIn / customPrice
             setTokenOut(
                 _out !== 0 && !!_out
-                    ? _out
+                    ? Math.round(_out * 1000000) / 1000000
                     : currentTradeMode === 'BUY'
-                    ? tokenIn * currentPrice
-                    : tokenIn / currentPrice
+                    ? Math.round(tokenIn * currentPrice * 1000000) / 1000000
+                    : Math.round((tokenIn / currentPrice) * 1000000) / 1000000
             )
         }
     }, [customPrice, currentTradeMode, tokenIn, currentPrice])
@@ -300,250 +331,224 @@ const OrderForm = () => {
     }, [customPrice])
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle>MonoTrade</CardTitle>
-                <CardDescription>
-                    MonoTrade is a one-way trading contract.
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <Card>
-                    <CardContent className="space-y-2">
-                        <div className="space-y-1 pt-4">
-                            <Label htmlFor="name">{`You're Selling`}</Label>
-                            <div className="flex items-center space-x-4">
-                                <Popover
-                                    open={formOpen}
-                                    onOpenChange={setFormOpen}
+        <Card className="w-[700px]">
+            <CardContent className="space-y-2">
+                <div className="space-y-3 pt-4">
+                    <Label htmlFor="name">{`You're Selling`}</Label>
+                    <div className="flex items-center space-x-4">
+                        <Popover open={formOpen} onOpenChange={setFormOpen}>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    role="combobox"
+                                    variant="outline"
+                                    className="w-[200px] justify-between text-lg"
                                 >
-                                    <PopoverTrigger asChild>
-                                        <Button
-                                            role="combobox"
-                                            variant="outline"
-                                            className="w-[200px] justify-between"
-                                        >
-                                            {formToken
-                                                ? symbolList.find(
-                                                      (_token) =>
-                                                          _token === formToken
-                                                  )
-                                                : 'Select token...'}
-                                            <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-[166px] p-0">
-                                        <Command>
-                                            <CommandInput
-                                                placeholder="Change status..."
-                                                className="h-9"
-                                            />
-                                            <CommandList>
-                                                <CommandEmpty>
-                                                    No results found.
-                                                </CommandEmpty>
-                                                <CommandGroup>
-                                                    {symbolList.map(
-                                                        (symbol, i) => (
-                                                            <CommandItem
-                                                                key={`${symbol}-formToken`}
-                                                                value={symbol}
-                                                                onSelect={(
-                                                                    value
-                                                                ) => {
-                                                                    setFormToken(
-                                                                        value
-                                                                    )
-                                                                }}
-                                                            >
-                                                                {symbol}
-                                                                <CheckIcon
-                                                                    className={cn(
-                                                                        'ml-auto h-4 w-4',
-                                                                        symbol ===
-                                                                            formToken
-                                                                            ? 'opacity-100'
-                                                                            : 'opacity-0'
-                                                                    )}
-                                                                />
-                                                            </CommandItem>
-                                                        )
-                                                    )}
-                                                </CommandGroup>
-                                            </CommandList>
-                                        </Command>
-                                    </PopoverContent>
-                                </Popover>
-                                <Input
-                                    id="name"
-                                    type="number"
-                                    className="border-0 text-right"
-                                    placeholder="0.00"
-                                    value={tokenIn}
-                                    onChange={(v) =>
-                                        changeTokenIn(
-                                            +v.target.value.replace(
-                                                /[^0-9.]/g,
-                                                ''
-                                            )
-                                        )
-                                    }
-                                />
-                            </div>
-                        </div>
-                        <div className="flex justify-center py-5">
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                className="rounded-full"
-                                onClick={() => handleChangeMode()}
-                            >
-                                <FaArrowRightArrowLeft className="h-4 w-4 rotate-90" />
-                            </Button>
-                        </div>
-                        <div className="space-y-1 ">
-                            <Label htmlFor="username">{`You're Buying`}</Label>
-                            <div className="flex items-center space-x-4">
-                                <Popover open={toOpen} onOpenChange={setToOpen}>
-                                    <PopoverTrigger asChild>
-                                        <Button
-                                            role="combobox"
-                                            variant="outline"
-                                            className="w-[200px] justify-between"
-                                        >
-                                            {toToken
-                                                ? symbolList.find(
-                                                      (_token) =>
-                                                          _token === toToken
-                                                  )
-                                                : 'Select token...'}
-                                            <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-[166px] p-0">
-                                        <Command>
-                                            <CommandInput
-                                                placeholder="Change status..."
-                                                className="h-9"
-                                            />
-                                            <CommandList>
-                                                <CommandEmpty>
-                                                    No results found.
-                                                </CommandEmpty>
-                                                <CommandGroup>
-                                                    {symbolList.map(
-                                                        (symbol) => (
-                                                            <CommandItem
-                                                                key={`${symbol}-toToken`}
-                                                                value={symbol}
-                                                                onSelect={(
-                                                                    value
-                                                                ) => {
-                                                                    setFormToken(
-                                                                        value
-                                                                    )
-                                                                }}
-                                                            >
-                                                                {symbol}
-                                                                <CheckIcon
-                                                                    className={cn(
-                                                                        'ml-auto h-4 w-4',
-                                                                        symbol ===
-                                                                            toToken
-                                                                            ? 'opacity-100'
-                                                                            : 'opacity-0'
-                                                                    )}
-                                                                />
-                                                            </CommandItem>
-                                                        )
-                                                    )}
-                                                </CommandGroup>
-                                            </CommandList>
-                                        </Command>
-                                    </PopoverContent>
-                                </Popover>
-                                <Input
-                                    id="name"
-                                    className="border-0 text-right"
-                                    placeholder="0.00"
-                                    value={tokenOut}
-                                    onChange={(v) =>
-                                        changeTokenOut(
-                                            +v.target.value.replace(
-                                                /[^0-9.]/g,
-                                                ''
-                                            )
-                                        )
-                                    }
-                                />
-                            </div>
-                        </div>
-                        <ResizablePanelGroup
-                            direction="horizontal"
-                            className="max-w-md rounded-lg border md:min-w-[450px]"
-                        >
-                            <ResizablePanel defaultSize={70}>
-                                <div className="pl-5 pt-3 text-sm text-gray-400">
-                                    Buy MEME at rate
-                                </div>
-                                <div className="flex h-[50px] items-center justify-center gap-4 px-6">
-                                    <Input
-                                        className="border-0 text-left"
-                                        placeholder="0.00"
-                                        value={customPriceInput}
-                                        disabled={mode === 'market'}
-                                        onChange={(v) => {
-                                            if (mode === 'limit') {
-                                                const value =
-                                                    v.target.value.replace(
-                                                        /[^0-9.]/g,
-                                                        ''
-                                                    )
-                                                const parts = value.split('.')
-                                                if (parts.length > 2) {
-                                                    // More than one decimal point, ignore
-                                                    return
-                                                }
-                                                if (
-                                                    parts[1] &&
-                                                    parts[1].length > 8
-                                                ) {
-                                                    // Limit to 8 decimal places
-                                                    return
-                                                }
-                                                setCustomPriceInput(value)
-                                                setCustomPrice(
-                                                    parseFloat(value) || 0
-                                                )
-                                            }
-                                        }}
+                                    {formToken
+                                        ? symbolList.find(
+                                              (_token) => _token === formToken
+                                          )
+                                        : 'Select token...'}
+                                    <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-[166px] p-0">
+                                <Command>
+                                    <CommandInput
+                                        placeholder="Change status..."
+                                        className="h-9"
                                     />
-                                    <span>USDT</span>
-                                </div>
-                                <div className="px-6 py-2 text-sm text-gray-400">
-                                    ≈ $
-                                    {parseFloat(
-                                        customPriceInput ||
-                                            currentPrice.toString()
-                                    ).toFixed(2)}
-                                </div>
-                            </ResizablePanel>
-                            <ResizableHandle />
-                            <ResizablePanel defaultSize={30}></ResizablePanel>
-                        </ResizablePanelGroup>
-                    </CardContent>
-                    <CardFooter className="">
-                        <Button
-                            onClick={() => handleApprove()}
-                            className={cn('w-full')}
-                        >
-                            {mode && mode === 'market'
-                                ? 'Place Market Order'
-                                : 'Place Limit Order'}
-                        </Button>
-                    </CardFooter>
-                </Card>
+                                    <CommandList>
+                                        <CommandEmpty>
+                                            No results found.
+                                        </CommandEmpty>
+                                        <CommandGroup>
+                                            {symbolList.map((symbol, i) => (
+                                                <CommandItem
+                                                    key={`${symbol}-formToken`}
+                                                    value={symbol}
+                                                    onSelect={(value) => {
+                                                        changeTokenInSymbol(
+                                                            value
+                                                        )
+                                                    }}
+                                                >
+                                                    {symbol}
+                                                    <CheckIcon
+                                                        className={cn(
+                                                            'ml-auto h-4 w-4',
+                                                            symbol === formToken
+                                                                ? 'opacity-100'
+                                                                : 'opacity-0'
+                                                        )}
+                                                    />
+                                                </CommandItem>
+                                            ))}
+                                        </CommandGroup>
+                                    </CommandList>
+                                </Command>
+                            </PopoverContent>
+                        </Popover>
+                        <Input
+                            id="name"
+                            type="number"
+                            className="border-0 text-right text-lg"
+                            placeholder="0.00"
+                            value={tokenIn}
+                            onChange={(v) =>
+                                changeTokenIn(
+                                    +v.target.value.replace(/[^0-9.]/g, '')
+                                )
+                            }
+                        />
+                    </div>
+                </div>
+                <div className="flex justify-center py-5">
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        className="rounded-full text-lg"
+                        onClick={() => handleChangeMode()}
+                    >
+                        <FaArrowRightArrowLeft className="h-4 w-4 rotate-90" />
+                    </Button>
+                </div>
+                <div className="space-y-3 ">
+                    <Label htmlFor="username">{`You're Buying`}</Label>
+                    <div className="flex items-center space-x-4">
+                        <Popover open={toOpen} onOpenChange={setToOpen}>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    role="combobox"
+                                    variant="outline"
+                                    className="w-[200px] justify-between text-lg"
+                                >
+                                    {toToken
+                                        ? symbolList.find(
+                                              (_token) => _token === toToken
+                                          )
+                                        : 'Select token...'}
+                                    <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-[166px] p-0">
+                                <Command>
+                                    <CommandInput
+                                        placeholder="Change status..."
+                                        className="h-9"
+                                    />
+                                    <CommandList>
+                                        <CommandEmpty>
+                                            No results found.
+                                        </CommandEmpty>
+                                        <CommandGroup>
+                                            {symbolList.map((symbol) => (
+                                                <CommandItem
+                                                    key={`${symbol}-toToken`}
+                                                    value={symbol}
+                                                    onSelect={(value) => {
+                                                        changeTokenOutSymbol(
+                                                            value
+                                                        )
+                                                        // setFormToken(value)
+                                                    }}
+                                                >
+                                                    {symbol}
+                                                    <CheckIcon
+                                                        className={cn(
+                                                            'ml-auto h-4 w-4',
+                                                            symbol === toToken
+                                                                ? 'opacity-100'
+                                                                : 'opacity-0'
+                                                        )}
+                                                    />
+                                                </CommandItem>
+                                            ))}
+                                        </CommandGroup>
+                                    </CommandList>
+                                </Command>
+                            </PopoverContent>
+                        </Popover>
+                        <Input
+                            id="name"
+                            type="number"
+                            className="border-0 text-right text-lg"
+                            placeholder="0.00"
+                            value={tokenOut}
+                            onChange={(v) =>
+                                changeTokenOut(
+                                    +v.target.value.replace(/[^0-9.]/g, '')
+                                )
+                            }
+                        />
+                    </div>
+                </div>
+                <div className="pt-8">
+                    <ResizablePanelGroup
+                        direction="horizontal"
+                        className=" w-full rounded-lg border"
+                    >
+                        <ResizablePanel defaultSize={100}>
+                            <div className="pl-5 pt-3 text-sm text-gray-400">
+                                {`${
+                                    currentTradeMode === 'SELL' ? 'Buy' : 'Sell'
+                                } MEME at rate`}
+                            </div>
+                            <div className="flex h-[50px] items-center justify-center gap-4 px-6">
+                                <Input
+                                    className="border-0 text-left text-lg"
+                                    placeholder="0.00"
+                                    value={customPriceInput}
+                                    disabled={mode === 'market'}
+                                    onChange={(v) => {
+                                        if (mode === 'limit') {
+                                            const value =
+                                                v.target.value.replace(
+                                                    /[^0-9.]/g,
+                                                    ''
+                                                )
+                                            const parts = value.split('.')
+                                            if (parts.length > 2) {
+                                                // More than one decimal point, ignore
+                                                return
+                                            }
+                                            if (
+                                                parts[1] &&
+                                                parts[1].length > 8
+                                            ) {
+                                                // Limit to 8 decimal places
+                                                return
+                                            }
+                                            setCustomPriceInput(value)
+                                            setCustomPrice(
+                                                parseFloat(value) || 0
+                                            )
+                                        }
+                                    }}
+                                />
+                                <span className="text-lg">USDT</span>
+                            </div>
+                            <div className="px-6 py-2 text-sm text-gray-400">
+                                ≈ $
+                                {parseFloat(
+                                    customPriceInput || currentPrice.toString()
+                                ).toFixed(2)}
+                            </div>
+                        </ResizablePanel>
+                        {/* <ResizableHandle /> */}
+                        {/* <ResizablePanel defaultSize={30}></ResizablePanel> */}
+                    </ResizablePanelGroup>
+                </div>
             </CardContent>
+            <CardFooter className="">
+                <Button
+                    onClick={() => handleApprove()}
+                    className={cn('w-full py-6 text-lg font-bold')}
+                >
+                    {mode && mode === 'market'
+                        ? 'Place Market Order'
+                        : 'Place Limit Order'}
+                </Button>
+            </CardFooter>
         </Card>
     )
 }

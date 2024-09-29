@@ -1,25 +1,19 @@
+import { Metadata } from 'next'
+import OrderForm from '@/components/forms/order-form'
+import OrderList from '@/components/order-list'
+import UserList from '@/components/user-list'
 import Header from '@/components/layout/header'
 import Link from 'next/link'
 import Sidebar from '@/components/layout/sidebar'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import type { Metadata } from 'next'
-
 export const metadata: Metadata = {
-    title: 'Next Shadcn Dashboard Starter',
-    description: 'Basic dashboard with Next.js and Shadcn'
+    title: 'spot',
+    description: ''
 }
 
-export default function SpotLayout({
-    children,
-    params
-}: {
-    children: React.ReactNode
-    params: {
-        methods: string
-    }
-}) {
-    const { methods } = params
+export default function Page() {
+    const methods = ['market', '0x566137bC9A4a28214B4407dd6dE8bff291C4C21F']
     return (
         <div className="m-0 h-screen p-0">
             <Header />
@@ -53,7 +47,17 @@ export default function SpotLayout({
                             </TabsTrigger>
                         </TabsList>
                     </Tabs>
-                    {children}
+                    <div className="flex justify-end gap-5 pb-5 pt-10">
+                        <div className="w-full">
+                            <OrderList />
+                        </div>
+                        <div className="w-lg">
+                            <OrderForm />
+                        </div>
+                    </div>
+                    <div className="flex-1 overflow-hidden">
+                        <UserList />
+                    </div>
                 </div>
                 {/* </main> */}
             </ScrollArea>

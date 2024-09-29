@@ -6,7 +6,6 @@ import {
     AccordionTrigger
 } from '@/components/ui/accordion'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { type Address } from 'viem'
 import { type UseAccountParameters, useAccount, useReadContract } from 'wagmi'
 import { useMarsDexStore } from '@/lib/store'
@@ -66,28 +65,28 @@ const UserList = () => {
                     </TabsTrigger>
                 </TabsList>
                 <TabsContent value="open-order">
-                    <ScrollArea className="h-[500px]">
-                        <Accordion type="multiple" className="w-full">
-                            {filteredOrderList.map((v, i) => (
-                                <UserListItem
-                                    key={`${v.trade}-${i}`}
-                                    tradeInfo={v}
-                                />
-                            ))}
-                        </Accordion>
-                    </ScrollArea>
+                    {/* <ScrollArea className="h-[500px]"> */}
+                    <Accordion type="multiple" className="w-full">
+                        {filteredOrderList.map((v, i) => (
+                            <UserListItem
+                                key={`${v.trade}-${i}`}
+                                tradeInfo={v}
+                            />
+                        ))}
+                    </Accordion>
+                    {/* </ScrollArea> */}
                 </TabsContent>
                 <TabsContent value="order-history">
-                    <ScrollArea className="h-[500px]">
-                        <Accordion type="multiple" className="w-full">
-                            {filteredOrderList.map((v, i) => (
-                                <UserListItem
-                                    key={`${v.trade}-${i}`}
-                                    tradeInfo={v}
-                                />
-                            ))}
-                        </Accordion>
-                    </ScrollArea>
+                    {/* <ScrollArea className="h-[500px]"> */}
+                    <Accordion type="multiple" className="w-full">
+                        {filteredOrderList.map((v, i) => (
+                            <UserListItem
+                                key={`${v.trade}-${i}`}
+                                tradeInfo={v}
+                            />
+                        ))}
+                    </Accordion>
+                    {/* </ScrollArea> */}
                 </TabsContent>
             </Tabs>
         </div>
