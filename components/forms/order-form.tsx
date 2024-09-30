@@ -35,7 +35,11 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { tokenlist } from '@/constants/data'
 import { cn } from '@/lib/utils'
-import { useAccount, useWaitForTransactionReceipt } from 'wagmi'
+import {
+    useAccount,
+    useWaitForTransactionReceipt,
+    useTransactionConfirmations
+} from 'wagmi'
 
 import { writeContract, simulateContract, readContract } from '@wagmi/core'
 import { type Address, parseUnits } from 'viem'
@@ -95,10 +99,12 @@ const OrderForm = () => {
     )
 
     const { data: approveRes } = useWaitForTransactionReceipt({
+        confirmations: 3,
         hash: approveHash,
         config
     })
     const { data: tradeRes } = useWaitForTransactionReceipt({
+        confirmations: 3,
         hash: tradeHash,
         config
     })
