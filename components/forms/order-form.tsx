@@ -86,7 +86,7 @@ const OrderForm = () => {
         [methods]
     )
     const mode = useMemo(
-        () => (methods && methods.length > 0 ? methods[0] : undefined),
+        () => (methods && methods.length > 0 ? methods[0] : 'market'),
         [methods]
     )
 
@@ -174,7 +174,9 @@ const OrderForm = () => {
             (item) => item.price
         )
         const isTakeOrder =
-            currentTradeMode === 'BUY'
+            mode === 'market'
+                ? true
+                : currentTradeMode === 'BUY'
                 ? customPrice <= priceList[0]
                 : customPrice >= priceList[priceList.length - 1]
 
@@ -188,7 +190,11 @@ const OrderForm = () => {
                 : buyMemeTradeAddr
             let args = []
             if (isTakeOrder) {
-                args = [_tradeaddress, _token0In, _token1Out]
+                args = [
+                    _tradeaddress,
+                    _token0In,
+                    mode === 'market' ? 1n : _token1Out
+                ]
             } else {
                 const beforeOrderId = (await readContract(config, {
                     address: serviceAddr,
@@ -199,10 +205,15 @@ const OrderForm = () => {
                 })) as number
                 args = [_tradeaddress, _token0In, _token1Out, beforeOrderId]
             }
+            // console.log({ mode, isTakeOrder })
+            // console.log({ args })
             const { request, result } = await simulateContract(config, {
                 address: serviceAddr,
                 abi: TradeServiceAbi,
-                functionName: isTakeOrder ? 'takeOrder' : 'makeOrder',
+                functionName:
+                    mode === 'market' || isTakeOrder
+                        ? 'takeOrder'
+                        : 'makeOrder',
                 args,
                 account: address
             })
