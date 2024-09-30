@@ -118,8 +118,8 @@ const UserListItem = ({ tradeInfo }: { tradeInfo: OrderListType }) => {
         <AccordionItem value={tradeInfo.orderId.toString()}>
             <AccordionTrigger className="flex items-center justify-between hover:no-underline">
                 <div className="flex flex-col items-start gap-y-2">
-                    <div className="w-48 whitespace-nowrap text-left text-red-500">{`卖: ${formattedAmountIn} ${token1Info.symbol}`}</div>
-                    <div className="w-48 whitespace-nowrap text-left text-green-500">{`买: ${formattedAmountOut} ${token0Info.symbol}`}</div>
+                    <div className="w-48 whitespace-nowrap text-left text-red-500">{`Sell: ${formattedAmountIn} ${token1Info.symbol}`}</div>
+                    <div className="w-48 whitespace-nowrap text-left text-green-500">{`Buy: ${formattedAmountOut} ${token0Info.symbol}`}</div>
                 </div>
                 <div className="w-48 whitespace-nowrap text-left">{`${priceDisplay}`}</div>
                 <div className="w-48 whitespace-nowrap text-left">
