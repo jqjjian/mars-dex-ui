@@ -78,15 +78,13 @@ const OrderForm = () => {
     const [approveHash, setApproveHash] = useState<Address>()
     const [tradeHash, setTradeHash] = useState<Address>()
 
-    const tradeAddr = methods
-        ? useMemo(
-              () =>
-                  methods && methods.length > 1
-                      ? (methods[1] as Address)
-                      : undefined,
-              [methods]
-          )
-        : '0x566137bC9A4a28214B4407dd6dE8bff291C4C21F'
+    const tradeAddr = useMemo(
+        () =>
+            methods && methods.length > 1
+                ? (methods[1] as Address)
+                : '0x566137bC9A4a28214B4407dd6dE8bff291C4C21F',
+        [methods]
+    )
     const mode = useMemo(
         () => (methods && methods.length > 0 ? methods[0] : undefined),
         [methods]

@@ -79,11 +79,11 @@ const OrderList = () => {
     const { currentPrice, currentTradeMode } = useMarsDexStore()
     // const { serviceAddr } = useContext(ServiceContext)
     const { methods } = useParams<{ methods: string }>()
-    const tradeAddr = methods
-        ? useMemo(() => {
-              return methods.length > 1 ? (methods[1] as Address) : undefined
-          }, [methods])
-        : '0x566137bC9A4a28214B4407dd6dE8bff291C4C21F'
+    const tradeAddr = useMemo(() => {
+        return methods && methods.length > 1
+            ? (methods[1] as Address)
+            : '0x566137bC9A4a28214B4407dd6dE8bff291C4C21F'
+    }, [methods])
 
     const { sellList, buyList } = useTradeInfo(tradeAddr as Address)
     return (
