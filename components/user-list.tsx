@@ -7,7 +7,12 @@ import {
 } from '@/components/ui/accordion'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { type Address } from 'viem'
-import { type UseAccountParameters, useAccount, useReadContract } from 'wagmi'
+import {
+    type UseAccountParameters,
+    useAccount,
+    useReadContract,
+    useBlockNumber
+} from 'wagmi'
 import { useMarsDexStore } from '@/lib/store'
 import { config } from '@/config'
 import { TradeServiceAbi } from '@/constants/abi'
@@ -17,6 +22,7 @@ import { useState } from 'react'
 import { uint32Value } from '@/constants/data'
 
 const UserList = () => {
+    const { data: blockNumber, refetch } = useBlockNumber()
     const [activeTab, setActiveTab] = useState('open-order')
     const { address } = useAccount({
         ...config
@@ -27,6 +33,7 @@ const UserList = () => {
     const num = 20
 
     const { data: orderList } = useReadContract({
+        blockNumber,
         abi: TradeServiceAbi,
         address: serviceAddr,
         functionName: 'getUserOrders',

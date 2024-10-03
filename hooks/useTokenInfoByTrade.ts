@@ -1,7 +1,7 @@
 import { useMemo, useCallback, useState, useEffect } from 'react'
 import * as R from 'ramda'
 import { useAccount, useReadContracts, type UseAccountParameters } from 'wagmi'
-import { type Address, formatUnits } from 'viem'
+import { type Address, formatUnits, type Abi } from 'viem'
 import { MonoTradeAbi, ERC20Abi } from '@/constants/abi'
 import { config } from '@/config'
 import { type TokenInfoType } from '@/lib/store'
@@ -42,7 +42,7 @@ export default function useTokenInfoByTrade(tradeAddr: Address) {
     const fetchTokenInfo = (tokenAddress: Address) => {
         const symbolConfig = {
             address: tokenAddress,
-            abi: ERC20Abi
+            abi: ERC20Abi as Abi
         } as const
 
         const { data: _tokenInfo, error: tokenInfoError } = useReadContracts({
@@ -60,30 +60,39 @@ export default function useTokenInfoByTrade(tradeAddr: Address) {
                     ...symbolConfig,
                     functionName: 'decimals'
                 },
-                {
-                    ...symbolConfig,
-                    functionName: 'balanceOf',
-                    args: [address ?? undefined]
-                }
+                ...(address
+                    ? [
+                          {
+                              ...symbolConfig,
+                              functionName: 'balanceOf',
+                              args: [address]
+                          }
+                      ]
+                    : [])
             ]
         })
 
         const tokenInfo = useMemo(() => {
-            return (
-                address &&
-                _tokenInfo &&
-                ({
-                    address: tokenAddress,
-                    name: _tokenInfo[0].result,
-                    symbol: _tokenInfo[1].result,
-                    decimals: _tokenInfo[2].result,
-                    balanceOf: formatUnits(
-                        _tokenInfo[3].result as bigint,
-                        _tokenInfo[2].result as number
-                    )
-                } as TokenInfoType)
-            )
-        }, [_tokenInfo, address])
+            if (!_tokenInfo) return null
+
+            const [name, symbol, decimals, balance] = _tokenInfo
+
+            return {
+                address: tokenAddress,
+                name: name.result,
+                symbol: symbol.result,
+                decimals: decimals.result,
+                balanceOf:
+                    balance &&
+                    balance.status === 'success' &&
+                    balance.result !== undefined
+                        ? formatUnits(
+                              balance.result as bigint,
+                              decimals.result as number
+                          )
+                        : '0'
+            } as TokenInfoType
+        }, [_tokenInfo, address, tokenAddress])
 
         return { tokenInfo, tokenInfoError }
     }

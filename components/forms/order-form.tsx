@@ -349,7 +349,19 @@ const OrderForm = () => {
         <Card className="w-[700px]">
             <CardContent className="space-y-2">
                 <div className="space-y-3 pt-4">
-                    <Label htmlFor="name">{`You're Selling`}</Label>
+                    <div className="flex justify-between">
+                        <Label htmlFor="name">{`You're Selling`}</Label>
+                        <div className="flex gap-2 pr-7">
+                            <span>
+                                {(token0Info &&
+                                    Math.round(
+                                        +token0Info.balanceOf * 1000000
+                                    ) / 1000000) ||
+                                    0}
+                            </span>
+                            <span>{formToken}</span>
+                        </div>
+                    </div>
                     <div className="flex items-center space-x-4">
                         <Popover open={formOpen} onOpenChange={setFormOpen}>
                             <PopoverTrigger asChild>
@@ -428,7 +440,19 @@ const OrderForm = () => {
                     </Button>
                 </div>
                 <div className="space-y-3 ">
-                    <Label htmlFor="username">{`You're Buying`}</Label>
+                    <div className="flex justify-between">
+                        <Label htmlFor="username">{`You're Buying`}</Label>
+                        <div className="flex gap-2 pr-7">
+                            <span>
+                                {(token1Info &&
+                                    Math.round(
+                                        +token1Info.balanceOf * 1000000
+                                    ) / 1000000) ||
+                                    0}
+                            </span>
+                            <span>{toToken}</span>
+                        </div>
+                    </div>
                     <div className="flex items-center space-x-4">
                         <Popover open={toOpen} onOpenChange={setToOpen}>
                             <PopoverTrigger asChild>

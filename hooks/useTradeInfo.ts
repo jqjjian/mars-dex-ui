@@ -36,8 +36,9 @@ export default function useTradeInfo(tradeAddr: Address) {
         useTokenInfoByTrade(tradeAddr)
 
     const [usdtInfo, memeInfo, usdtAddr, memeAddr] = useMemo(() => {
-        if (!token0Info || !token1Info || !tradeTokens)
+        if (!token0Info || !token1Info || !tradeTokens) {
             return [null, null, null, null]
+        }
         const isToken0USDT = token0Info.symbol === 'USDT'
         return isToken0USDT
             ? [token0Info, token1Info, tradeTokens[0], tradeTokens[1]]
@@ -91,15 +92,19 @@ export default function useTradeInfo(tradeAddr: Address) {
                 .map((v) => {
                     const _out = +formatUnits(
                         v.amountOut,
-                        isUSDT ? usdtInfo!.decimals : memeInfo!.decimals
+                        isUSDT
+                            ? usdtInfo?.decimals ?? 6
+                            : memeInfo?.decimals ?? 18
                     )
                     const _in = +formatUnits(
                         v.amountIn,
-                        isUSDT ? memeInfo!.decimals : usdtInfo!.decimals
+                        isUSDT
+                            ? memeInfo?.decimals ?? 18
+                            : usdtInfo?.decimals ?? 6
                     )
                     const _amount = +formatUnits(
                         isUSDT ? v.amountIn : v.amountOut,
-                        memeInfo!.decimals
+                        memeInfo?.decimals ?? 18
                     )
                     const proportion =
                         v.progress !== 0 ? 1 - v.progress / uint32Value : 1
