@@ -13,7 +13,8 @@ export const metadata: Metadata = {
 }
 
 export default function Page() {
-    const methods = ['market', '0x566137bC9A4a28214B4407dd6dE8bff291C4C21F']
+    // const methods = ['market', '0x566137bC9A4a28214B4407dd6dE8bff291C4C21F']
+    const methods = ['market', '0x75351fD68BDC2cafc6f1C80993421b08aC2bf0eA']
     return (
         <div className="m-0 h-screen p-0">
             <Header />

@@ -82,7 +82,7 @@ const OrderList = () => {
     const tradeAddr = useMemo(() => {
         return methods && methods.length > 1
             ? (methods[1] as Address)
-            : '0x566137bC9A4a28214B4407dd6dE8bff291C4C21F'
+            : '0x75351fD68BDC2cafc6f1C80993421b08aC2bf0eA'
     }, [methods])
 
     const { sellList, buyList } = useTradeInfo(tradeAddr as Address)

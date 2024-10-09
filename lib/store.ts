@@ -147,7 +147,7 @@ export const useMarsDexStore = create<AccountState & MarsDexActions>()(
             sellList: [],
             buyList: [],
             account: null,
-            serviceAddr: '0x2d90e99d7ff0f7ad75e94bfceae21ebfdbadad84',
+            serviceAddr: '0xd8456d902cb9fcfab991ca8e48312f5718cdaa79',
             sellMemeTradeAddr: undefined,
             buyMemeTradeAddr: undefined,
             setToken0Info: (token: TokenInfoType) =>
