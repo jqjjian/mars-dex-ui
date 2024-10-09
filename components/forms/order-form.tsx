@@ -63,7 +63,7 @@ const OrderForm = () => {
         token0Info,
         token1Info
     } = useMarsDexStore()
-
+    // console.log(currentTradeMode)
     const [symbolList] = useState<string[]>([
         'USDT',
         'MEME'
@@ -86,7 +86,7 @@ const OrderForm = () => {
         () =>
             methods && methods.length > 1
                 ? (methods[1] as Address)
-                : '0x566137bC9A4a28214B4407dd6dE8bff291C4C21F',
+                : '0x75351fD68BDC2cafc6f1C80993421b08aC2bf0eA',
         [methods]
     )
     const mode = useMemo(
@@ -194,7 +194,11 @@ const OrderForm = () => {
                 : currentTradeMode === 'BUY'
                 ? sellMemeTradeAddr
                 : buyMemeTradeAddr
-            let args = []
+            let args = [
+                // _tradeaddress,
+                // _token0In,
+                // mode === 'market' ? 1n : _token1Out
+            ]
             if (isTakeOrder) {
                 args = [
                     _tradeaddress,
@@ -218,7 +222,7 @@ const OrderForm = () => {
                 abi: TradeServiceAbi,
                 functionName:
                     mode === 'market' || isTakeOrder
-                        ? 'takeOrder'
+                        ? 'placeOrder'
                         : 'makeOrder',
                 args,
                 account: address
@@ -241,6 +245,7 @@ const OrderForm = () => {
             })
         }
     }, [
+        mode,
         address,
         usdtInfo,
         memeInfo,
