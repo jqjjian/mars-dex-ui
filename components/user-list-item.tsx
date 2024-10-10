@@ -5,11 +5,16 @@ import {
     AccordionItem,
     AccordionTrigger
 } from '@/components/ui/accordion'
+import { config } from '@/config'
+import { useAccount, useWaitForTransactionReceipt } from 'wagmi'
+import { ERC20Abi, TradeServiceAbi, MonoTradeAbi } from '@/constants/abi'
+import { writeContract, simulateContract, readContract } from '@wagmi/core'
 import { useTokenInfoByTrade } from '@/hooks'
 import { OrderListType } from '@/types'
-import { useMemo } from 'react'
-import { formatUnits } from 'viem'
+import { useEffect, useMemo, useState } from 'react'
+import { formatUnits, type Address } from 'viem'
 import { uint32Value } from '@/constants/data'
+import { Button } from './ui/button'
 const DECIMAL_PLACES = 4
 const USTD_SYMBOL = 'USDT'
 
@@ -25,8 +30,21 @@ const formatAmount = (amount: bigint, decimals: number) => {
         : integerPart
 }
 
-const UserListItem = ({ tradeInfo }: { tradeInfo: OrderListType }) => {
+const UserListItem = ({
+    tradeInfo,
+    cbfn
+}: {
+    tradeInfo: OrderListType
+    cbfn: () => void
+}) => {
+    const { address } = useAccount()
     const { token0Info, token1Info } = useTokenInfoByTrade(tradeInfo.trade)
+    const [tradeHash, setTradeHash] = useState<Address>()
+    const { data: tradeRes } = useWaitForTransactionReceipt({
+        confirmations: 3,
+        hash: tradeHash,
+        config
+    })
 
     const formattedAmountIn = useMemo(
         () =>
@@ -44,10 +62,10 @@ const UserListItem = ({ tradeInfo }: { tradeInfo: OrderListType }) => {
         [token0Info, tradeInfo.amountOut]
     )
 
-    const isSellUstd = useMemo(
-        () => token0Info?.symbol === USTD_SYMBOL,
-        [token0Info]
-    )
+    // const isSellUstd = useMemo(
+    //     () => token0Info?.symbol === USTD_SYMBOL,
+    //     [token0Info]
+    // )
 
     const calculatePrice = useMemo(() => {
         if (
@@ -110,6 +128,31 @@ const UserListItem = ({ tradeInfo }: { tradeInfo: OrderListType }) => {
         return `${soldAmount} / ${formattedAmountIn} ${token1Info.symbol} (${progressDisplay})`
     }, [soldAmount, formattedAmountIn, token1Info, progressDisplay])
 
+    const handleCancelOrder = async () => {
+        const { request, result } = await simulateContract(config, {
+            address: tradeInfo.trade,
+            abi: MonoTradeAbi,
+            functionName: 'cancelOrder',
+            args: [tradeInfo.orderId],
+            account: address
+        })
+
+        if (result) {
+            const res = await writeContract(config, request)
+            setTradeHash(res)
+
+            console.log(res)
+        }
+    }
+    // console.log(3333)
+    useEffect(() => {
+        if (tradeRes && cbfn) {
+            console.log('Cancel Order Success!')
+            cbfn()
+            setTradeHash(undefined)
+        }
+    }, [tradeRes, cbfn])
+
     if (!token0Info || !token1Info) {
         return <div>Loading trade information...</div>
     }
@@ -135,6 +178,12 @@ const UserListItem = ({ tradeInfo }: { tradeInfo: OrderListType }) => {
                 <div className="flex justify-between">
                     <div>Total Filled</div>
                     <div>{totalFilledDisplay}</div>
+                </div>
+                <div className="flex justify-center">
+                    <Button
+                        onClick={() => handleCancelOrder()}
+                        variant="ghost"
+                    >{` Cancel Order `}</Button>
                 </div>
             </AccordionContent>
         </AccordionItem>

@@ -73,7 +73,7 @@ export default function Providers({
             <WagmiProvider config={config}>
                 <QueryClientProvider client={queryClient}>
                     <RainbowKitProvider>
-                        <ThemeProvider attribute="class" defaultTheme="system">
+                        <ThemeProvider attribute="class" defaultTheme="dark">
                             {/* <SessionProvider session={session}> */}
                             {children}
                             {/* </SessionProvider> */}

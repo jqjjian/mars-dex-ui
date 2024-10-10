@@ -36,6 +36,7 @@ export type OrderListType = {
     amountOut: bigint
     index: number
     orderId: number
+    isRemoved: boolean
     progress: number
     token0: Address
     token1: Address

@@ -42,7 +42,7 @@ import {
 } from 'wagmi'
 
 import { writeContract, simulateContract, readContract } from '@wagmi/core'
-import { type Address, parseUnits } from 'viem'
+import { type Address, parseUnits, formatUnits } from 'viem'
 import { config } from '@/config'
 import { useMarsDexStore } from '@/lib/store'
 import { useParams } from 'next/navigation'
@@ -69,6 +69,7 @@ const OrderForm = () => {
         'MEME'
         // ...new Set([...tokenlist, 'USDT'])
     ])
+    const [transactionFee, setTransactionFee] = useState('')
     const [formOpen, setFormOpen] = useState(false)
     const [formToken, setFormToken] = useState('')
     const [toOpen, setToOpen] = useState(false)
@@ -268,8 +269,8 @@ const OrderForm = () => {
             `${tokenIn}`,
             currentTradeMode === 'BUY' ? memeInfo.decimals : usdtInfo.decimals
         )
-        const fee = 100n
-        const token0InWithFee = (_token0In * fee) / 10000n + _token0In
+        const fee = (_token0In * 100n) / 10000n
+        const token0InWithFee = fee + _token0In
 
         try {
             const res = await writeContract(config, {
@@ -350,21 +351,33 @@ const OrderForm = () => {
         setCustomPriceInput(customPrice.toString())
     }, [customPrice])
 
+    useEffect(() => {
+        if (tokenIn && memeInfo && usdtInfo && currentTradeMode) {
+            const decimals =
+                currentTradeMode === 'BUY'
+                    ? memeInfo.decimals
+                    : usdtInfo.decimals
+            const _token0In = parseUnits(`${tokenIn}`, decimals)
+            const fee = (_token0In * 100n) / 10000n
+            setTransactionFee(formatUnits(fee, decimals))
+        }
+    }, [tokenIn, memeInfo, usdtInfo, currentTradeMode])
     return (
         <Card className="w-[700px]">
             <CardContent className="space-y-2">
                 <div className="space-y-3 pt-4">
-                    <div className="flex justify-between">
+                    <div className="flex items-center justify-between">
                         <Label htmlFor="name">{`You're Selling`}</Label>
                         <div className="flex gap-2 pr-7">
                             <span>
+                                {`Balance: `}
                                 {(token0Info &&
                                     Math.round(
                                         +token0Info.balanceOf * 1000000
                                     ) / 1000000) ||
                                     0}
                             </span>
-                            <span>{formToken}</span>
+                            <span>{`${formToken}`}</span>
                         </div>
                     </div>
                     <div className="flex items-center space-x-4">
@@ -445,10 +458,11 @@ const OrderForm = () => {
                     </Button>
                 </div>
                 <div className="space-y-3 ">
-                    <div className="flex justify-between">
+                    <div className="flex items-center justify-between">
                         <Label htmlFor="username">{`You're Buying`}</Label>
                         <div className="flex gap-2 pr-7">
                             <span>
+                                {`Balance: `}
                                 {(token1Info &&
                                     Math.round(
                                         +token1Info.balanceOf * 1000000
@@ -571,11 +585,17 @@ const OrderForm = () => {
                                 />
                                 <span className="text-lg">USDT</span>
                             </div>
-                            <div className="px-6 py-2 text-sm text-gray-400">
-                                ≈ $
-                                {parseFloat(
-                                    customPriceInput || currentPrice.toString()
-                                ).toFixed(2)}
+                            <div className="flex items-center justify-between px-6">
+                                <div className="py-2 text-sm text-gray-400">
+                                    ≈ $
+                                    {parseFloat(
+                                        customPriceInput ||
+                                            currentPrice.toString()
+                                    ).toFixed(2)}
+                                </div>
+                                <div className="text-sm text-gray-400">
+                                    {`Max Transaction Fee: ${transactionFee} ${token0Info?.symbol}`}
+                                </div>
                             </div>
                         </ResizablePanel>
                         {/* <ResizableHandle /> */}

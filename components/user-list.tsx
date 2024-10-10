@@ -39,10 +39,11 @@ const UserList = () => {
         functionName: 'getUserOrders',
         args: [address, lastIndex, num]
     }) as { data: OrderListType[] | undefined }
-
+    // console.log(orderList)
     const filteredOrderList =
         orderList?.reduce((acc, order) => {
             if (
+                !order.isRemoved &&
                 order.orderId !== 0 &&
                 !acc.some((item) => item.orderId === order.orderId)
             ) {
@@ -78,6 +79,7 @@ const UserList = () => {
                             <UserListItem
                                 key={`${v.trade}-${i}`}
                                 tradeInfo={v}
+                                cbfn={refetch}
                             />
                         ))}
                     </Accordion>
@@ -90,6 +92,7 @@ const UserList = () => {
                             <UserListItem
                                 key={`${v.trade}-${i}`}
                                 tradeInfo={v}
+                                cbfn={refetch}
                             />
                         ))}
                     </Accordion>

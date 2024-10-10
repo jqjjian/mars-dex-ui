@@ -101,8 +101,8 @@ const OrderList = () => {
                         {/* <CommandEmpty>No results found.</CommandEmpty> */}
                         <CommandGroup heading="">
                             <div className="flex justify-between px-2">
-                                <span>Price（USDT） </span>
-                                <span>Amount </span>
+                                <span>{`Price (USDT)`} </span>
+                                <span>{`Amount (MEME)`}</span>
                                 {/* <CommandItem>
                                     <CalendarIcon className="mr-2 h-4 w-4" />
                                     <span>Calendar</span>
