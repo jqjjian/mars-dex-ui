@@ -32,10 +32,12 @@ const formatAmount = (amount: bigint, decimals: number) => {
 
 const UserListItem = ({
     tradeInfo,
-    cbfn
+    cbfn,
+    mode
 }: {
     tradeInfo: OrderListType
     cbfn: () => void
+    mode: 'open-order' | 'order-history'
 }) => {
     const { address } = useAccount()
     const { token0Info, token1Info } = useTokenInfoByTrade(tradeInfo.trade)
@@ -113,6 +115,8 @@ const UserListItem = ({
     const progressDisplay = useMemo(() => {
         return progressPercentage === 100
             ? 'Completed'
+            : tradeInfo.isRemoved
+            ? 'Cancel'
             : `${progressPercentage.toFixed(2)}%`
     }, [progressPercentage])
 
@@ -180,10 +184,12 @@ const UserListItem = ({
                     <div>{totalFilledDisplay}</div>
                 </div>
                 <div className="flex justify-center">
-                    <Button
-                        onClick={() => handleCancelOrder()}
-                        variant="ghost"
-                    >{` Cancel Order `}</Button>
+                    {mode === 'open-order' && (
+                        <Button
+                            onClick={() => handleCancelOrder()}
+                            variant="ghost"
+                        >{` Cancel Order `}</Button>
+                    )}
                 </div>
             </AccordionContent>
         </AccordionItem>

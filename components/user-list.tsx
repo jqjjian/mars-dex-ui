@@ -43,7 +43,7 @@ const UserList = () => {
     const filteredOrderList =
         orderList?.reduce((acc, order) => {
             if (
-                !order.isRemoved &&
+                // !order.isRemoved &&
                 order.orderId !== 0 &&
                 !acc.some((item) => item.orderId === order.orderId)
             ) {
@@ -54,8 +54,10 @@ const UserList = () => {
                 const isCompleted = progressPercentage === 100
 
                 if (
-                    (activeTab === 'open-order' && !isCompleted) ||
-                    (activeTab === 'order-history' && isCompleted)
+                    (activeTab === 'open-order' &&
+                        !isCompleted &&
+                        !order.isRemoved) ||
+                    activeTab === 'order-history'
                 ) {
                     acc.push(order)
                 }
@@ -78,6 +80,7 @@ const UserList = () => {
                         {filteredOrderList.map((v, i) => (
                             <UserListItem
                                 key={`${v.trade}-${i}`}
+                                mode="open-order"
                                 tradeInfo={v}
                                 cbfn={refetch}
                             />
@@ -91,6 +94,7 @@ const UserList = () => {
                         {filteredOrderList.map((v, i) => (
                             <UserListItem
                                 key={`${v.trade}-${i}`}
+                                mode="order-history"
                                 tradeInfo={v}
                                 cbfn={refetch}
                             />

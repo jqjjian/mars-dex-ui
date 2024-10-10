@@ -594,7 +594,7 @@ const OrderForm = () => {
                                     ).toFixed(2)}
                                 </div>
                                 <div className="text-sm text-gray-400">
-                                    {`Max Transaction Fee: ${transactionFee} ${token0Info?.symbol}`}
+                                    {`Max Trading Fee: ${transactionFee} ${token0Info?.symbol}`}
                                 </div>
                             </div>
                         </ResizablePanel>
