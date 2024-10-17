@@ -11,14 +11,15 @@ import {
     type UseAccountParameters,
     useAccount,
     useReadContract,
-    useBlockNumber
+    useBlockNumber,
+    useWatchContractEvent
 } from 'wagmi'
 import { useMarsDexStore } from '@/lib/store'
 import { config } from '@/config'
-import { TradeServiceAbi } from '@/constants/abi'
+import { TradeServiceAbi, MonoTradeAbi } from '@/constants/abi'
 import UserListItem from './user-list-item'
 import { OrderListType } from '@/types'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { uint32Value } from '@/constants/data'
 
 const UserList = () => {
@@ -64,7 +65,24 @@ const UserList = () => {
             }
             return acc
         }, [] as OrderListType[]) || []
-
+    useWatchContractEvent({
+        // address: '0x6b175474e89094c44da98b954eedeac495271d0f',
+        abi: MonoTradeAbi,
+        eventName: 'TakeOrder',
+        onLogs(logs) {
+            console.log('New logs!', logs)
+        }
+    })
+    // useEffect(() => {
+    //     useWatchContractEvent({
+    //         address: '0x6b175474e89094c44da98b954eedeac495271d0f',
+    //         abi,
+    //         eventName: 'TakeOrder',
+    //         onLogs(logs) {
+    //             console.log('New logs!', logs)
+    //         }
+    //     })
+    // }, [])
     return (
         <div className="h-full w-full">
             <Tabs defaultValue="open-order" onValueChange={setActiveTab}>

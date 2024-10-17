@@ -5,6 +5,11 @@ import { Column } from '@/components/kanban/board-column'
 import { UniqueIdentifier } from '@dnd-kit/core'
 import { type UseAccountReturnType } from 'wagmi'
 import { Address } from 'viem'
+// import getConfig from 'next/config'
+
+// const { publicRuntimeConfig } = getConfig()
+// const SERVICE_ADDR = publicRuntimeConfig.SERVICE_ADDR
+
 export type Status = 'TODO' | 'IN_PROGRESS' | 'DONE'
 
 const defaultCols = [
@@ -137,6 +142,8 @@ export type MarsDexActions = {
     // removeApiKey: (id: number) => void
     // setApiKeys: (updatedApiKey: ApiKey[]) => void
 }
+const SERVICE_ADDR = process.env.NEXT_PUBLIC_SERVICE_ADDR
+console.log(SERVICE_ADDR)
 export const useMarsDexStore = create<AccountState & MarsDexActions>()(
     persist(
         (set) => ({
@@ -147,7 +154,7 @@ export const useMarsDexStore = create<AccountState & MarsDexActions>()(
             sellList: [],
             buyList: [],
             account: null,
-            serviceAddr: '0xd8456d902cb9fcfab991ca8e48312f5718cdaa79',
+            serviceAddr: SERVICE_ADDR as Address,
             sellMemeTradeAddr: undefined,
             buyMemeTradeAddr: undefined,
             setToken0Info: (token: TokenInfoType) =>

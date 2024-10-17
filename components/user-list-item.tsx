@@ -116,7 +116,7 @@ const UserListItem = ({
         return progressPercentage === 100
             ? 'Completed'
             : tradeInfo.isRemoved
-            ? 'Cancel'
+            ? 'Cancelled'
             : `${progressPercentage.toFixed(2)}%`
     }, [progressPercentage])
 

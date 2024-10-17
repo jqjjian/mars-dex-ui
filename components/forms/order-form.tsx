@@ -49,8 +49,12 @@ import { useParams } from 'next/navigation'
 import { ERC20Abi, TradeServiceAbi } from '@/constants/abi'
 import { useTradeInfo } from '@/hooks'
 import { toast } from 'sonner'
-
+// import getConfig from 'next/config'
+const USDT_MEME_ADDR = process.env.NEXT_PUBLIC_USDT_MEME_ADDR
+console.log(USDT_MEME_ADDR)
 const OrderForm = () => {
+    // const { publicRuntimeConfig } = getConfig()
+    // const USDT_MEME_ADDR = publicRuntimeConfig.USDT_MEME_ADDR
     const router = useRouter()
     const { methods } = useParams<{ methods: string }>()
     const { address } = useAccount()
@@ -87,7 +91,7 @@ const OrderForm = () => {
         () =>
             methods && methods.length > 1
                 ? (methods[1] as Address)
-                : '0x75351fD68BDC2cafc6f1C80993421b08aC2bf0eA',
+                : USDT_MEME_ADDR,
         [methods]
     )
     const mode = useMemo(

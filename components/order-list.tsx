@@ -58,6 +58,7 @@ import { MonoTradeAbi, ERC20Abi, TradeServiceAbi } from '@/constants/abi'
 import { useMarsDexStore } from '@/lib/store'
 import { type TokenInfoType } from '@/lib/store'
 import { useTradeInfo } from '@/hooks'
+// import getConfig from 'next/config'
 type OrderListType = {
     amountIn: bigint
     amountOut: bigint
@@ -70,7 +71,10 @@ type OrderListType = {
 //     decimals: number
 //     balanceOf: bigint
 // }
+const USDT_MEME_ADDR = process.env.NEXT_PUBLIC_USDT_MEME_ADDR
 const OrderList = () => {
+    // const { publicRuntimeConfig } = getConfig()
+    // const USDT_MEME_ADDR = publicRuntimeConfig.USDT_MEME_ADDR
     const { data: blockNumber, refetch: getBlockNumber } = useBlockNumber()
     const { address, isConnected, chainId } = useAccount({
         ...config
@@ -82,7 +86,7 @@ const OrderList = () => {
     const tradeAddr = useMemo(() => {
         return methods && methods.length > 1
             ? (methods[1] as Address)
-            : '0x75351fD68BDC2cafc6f1C80993421b08aC2bf0eA'
+            : USDT_MEME_ADDR
     }, [methods])
 
     const { sellList, buyList } = useTradeInfo(tradeAddr as Address)

@@ -7,14 +7,19 @@ import Link from 'next/link'
 import Sidebar from '@/components/layout/sidebar'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ScrollArea } from '@/components/ui/scroll-area'
+// import getConfig from 'next/config'
 export const metadata: Metadata = {
     title: 'spot',
     description: ''
 }
 
+const USDT_MEME_ADDR = process.env.NEXT_PUBLIC_USDT_MEME_ADDR
+console.log(USDT_MEME_ADDR)
 export default function Page() {
+    // const { publicRuntimeConfig } = getConfig()
+    // const USDT_MEME_ADDR = publicRuntimeConfig.USDT_MEME_ADDR
     // const methods = ['market', '0x566137bC9A4a28214B4407dd6dE8bff291C4C21F']
-    const methods = ['market', '0x75351fD68BDC2cafc6f1C80993421b08aC2bf0eA']
+    const methods = ['market', USDT_MEME_ADDR]
     return (
         <div className="m-0 h-screen p-0">
             <Header />

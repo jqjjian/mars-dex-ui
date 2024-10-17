@@ -59,6 +59,7 @@
         "clsx": "^2.0.0",
         "cmdk": "1.0.0",
         "date-fns": "^2.30.0",
+        "dotenv": "^16.4.5",
         "eslint": "8.48.0",
         "eslint-config-next": "^14.0.1",
         "lucide-react": "^0.291.0",
@@ -83,7 +84,7 @@
         "typescript": "5.2.2",
         "uploadthing": "^5.7.4",
         "uuid": "^9.0.1",
-        "viem": "2.x",
+        "viem": "~2.21.28",
         "wagmi": "^2.12.8",
         "zod": "^3.22.4",
         "zustand": "^4.4.6"
